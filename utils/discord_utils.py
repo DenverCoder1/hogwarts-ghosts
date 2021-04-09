@@ -19,7 +19,7 @@ def create_no_argument_embed(arg_name: str ='argument') -> discord.Embed:
     return embed
 
 
-def populate_embed(names: list, values: list, inline: bool = False) -> discord.Embed:
+def create_fill_embed(names: list, values: list, inline: bool = False) -> discord.Embed:
     """Populate an embed with a list of names and values"""
     embed = discord.Embed(color=constants.EMBED_COLOR)
     for idx in range(len(names)):
