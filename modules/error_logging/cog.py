@@ -1,9 +1,12 @@
+import sys
+import os
+import heroku3
 from discord.ext import commands
 from modules.error_logging.error_handling import ErrorHandler
 from modules.error_logging import error_constants
 from utils import discord_utils, logging_utils
-import sys
-import os
+
+
 
 
 
@@ -12,9 +15,11 @@ import os
 class ErrorLogCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        heroku_connection = heroku3.from_key(os.getenv('HEROKU_API_KEY'))
+        self.heroku = heroku_connection.apps()['bot-be-named']
 
-    @commands.command(name="errorlog")
     @commands.is_owner()
+    @commands.command(name="errorlog", aliases=["errorlogs"])
     async def errorlog(self, ctx, num_lines: int = 50):
         """Shows errors in reverse chronological order
 
@@ -37,6 +42,21 @@ class ErrorLogCog(commands.Cog):
             if len(last_n_lines) > 1990:
                 last_n_lines = f"...\n{last_n_lines[-1990:]}"
             await ctx.send(f"```{last_n_lines}```")
+
+    @commands.is_owner()
+    @commands.command(name="herokulog", aliases=["herokulogs"])
+    async def herokulog(self, ctx, num_lines: int = 25):
+        """Shows logs from Heroku
+        
+        Category: Bot Owner Only.
+        Usage: `~herokulog`
+        """
+        logging_utils.log_command("herokulog", ctx.guild, ctx.channel, ctx.author)
+
+        heroku_logs = '\n'.join(self.heroku.get_log().split('\n')[-num_lines:])
+        if len(heroku_logs) > 1990:
+            heroku_logs = heroku_logs[-1990:]
+        await ctx.send(f"```{heroku_logs}```")   
 
 
 async def on_error(event, *args, **kwargs):
