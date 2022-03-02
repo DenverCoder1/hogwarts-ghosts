@@ -55,7 +55,6 @@ def get_trusteds():
                 trusteds[row.server_id] = [row.role_id]
     return trusteds
 
-
 def get_custom_commands():
     custom_commands = {}
     with Session(models.DATABASE_ENGINE) as session:
@@ -68,3 +67,16 @@ def get_custom_commands():
                 row.image,
             )
     return custom_commands
+
+def get_reminders():
+    reminders = {}
+    with Session(models.DATABASE_ENGINE) as session:
+        result = session.query(models.Reminders).all()
+        for row in result:
+            if row.channel_id not in reminders:
+                custom_commands[row.channel_id] = {}
+            reminders[row.channel_id][row.reminder_time.lower()] = (
+                row.user_id,
+                row.message,
+            )
+    return reminders

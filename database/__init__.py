@@ -6,6 +6,7 @@ from database.models import (
     Prefixes,
     SheetTethers,
     SheetTemplates,
+    Reminders,
 )
 
 from database.database_utils import (
@@ -15,6 +16,7 @@ from database.database_utils import (
     get_solvers,
     get_testers,
     get_custom_commands,
+    get_reminders,
 )
 
 PREFIXES = get_prefixes()
@@ -23,3 +25,4 @@ TRUSTEDS = get_trusteds()
 SOLVERS = get_solvers()
 TESTERS = get_testers()
 CUSTOM_COMMANDS = get_custom_commands()
+REMINDERS = get_reminders()

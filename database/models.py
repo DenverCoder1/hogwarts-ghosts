@@ -59,4 +59,16 @@ class Prefixes(Base):
     prefix = Column(String)
 
 
+class Reminders(Base):
+    __tablename__ = "reminders"
+    server_id = Column(BIGINT)
+    server_name = Column(String)
+    channel_id = Column(BIGINT)
+    channel_name = Column(String)
+    user_id = Column(BIGINT)
+    message = Column(String)
+    reminder_time = Column(BIGINT)
+    channel_id_reminder_time = Column(String, primary_key=True) # channel id + reminder time
+
+
 Base.metadata.create_all(DATABASE_ENGINE)
