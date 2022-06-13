@@ -98,16 +98,8 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
             last_message = archives_channel.last_message
         if last_message is None and archives_channel.last_message_id is not None:
             last_message = await archives_channel.fetch_message(archives_channel.last_message_id)
-        if last_message and last_message.attachments and not last_message.embeds:
-            embed = discord_utils.create_embed()
-            embed.add_field(
-                name=f"{constants.SUCCESS}",
-                value=f"The channel has been archived and will now be deleted.",
-            )
-            await progress_msg.edit(embed=embed)
-            await asyncio.sleep(2)
-            await ticket_channel.delete()
-        else:
+        # failure to archive the channel
+        if not last_message or not last_message.attachments or last_message.embeds:
             embed = discord_utils.create_embed()
             embed.add_field(
                 name=f"{constants.FAILED}",
@@ -118,6 +110,34 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
                 f"{ticket_channel.topic}, this channel may have too many attachments."
                 "Please save your attachments so this channel can be archived and deleted."
             )
+            return
+        # successfuly archived the channel
+        embed = discord_utils.create_embed()
+        embed.add_field(
+            name=f"{constants.SUCCESS}",
+            value=f"The channel has been archived and will now be deleted.",
+        )
+        await progress_msg.edit(embed=embed)
+        # send a message in the #mod-log channel
+        mod_log_channel = nextcord.utils.find(
+            lambda c: c.name == "mod-log", ctx.guild.text_channels
+        )
+        if mod_log_channel is not None:
+            embed = nextcord.Embed(
+                title="Confessional channel closed",
+                description=f"#{ticket_channel.name} by {ticket_channel.topic} has been archived and deleted by {ctx.author.mention}",
+                color=0x009999,
+            )
+            embed.set_author(
+                name=str(ctx.author),
+                icon_url=ctx.author.display_avatar.url,
+            )
+            embed.set_footer(text=f"ID: {ctx.author.id}")
+            embed.timestamp = nextcord.utils.utcnow()
+            await mod_log_channel.send(embed=embed)
+        # delete the channel
+        await asyncio.sleep(2)
+        await ticket_channel.delete()
 
 
 def setup(bot: commands.Bot):
