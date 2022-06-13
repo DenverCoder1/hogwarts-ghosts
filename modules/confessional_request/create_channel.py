@@ -78,6 +78,23 @@ If you have a question, please ping your hosts!""",
             color=0x009999,
         )
         await interaction.send(embed=embed, ephemeral=True)
+        # send a message in the #mod-log channel
+        mod_log_channel = nextcord.utils.find(
+            lambda c: c.name == "mod-log", interaction.guild.text_channels
+        )
+        if mod_log_channel is not None:
+            embed = nextcord.Embed(
+                title="Confessional channel created",
+                description=f"{interaction.user.mention} created a channel in **{category.name}**",
+                color=0x009999,
+            )
+            embed.set_author(
+                name=str(interaction.user),
+                icon_url=interaction.user.display_avatar.url,
+            )
+            embed.set_footer(text=f"ID: {interaction.user.id}")
+            embed.timestamp = nextcord.utils.utcnow()
+            await mod_log_channel.send(embed=embed)
 
 
 class CreateChannelView(nextcord.ui.View):
