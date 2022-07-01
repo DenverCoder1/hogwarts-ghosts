@@ -107,8 +107,8 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
             )
             await progress_msg.edit(embed=embed)
             await ctx.send(
-                f"{ticket_channel.topic}, this channel may have too many attachments."
-                "Please save your attachments so this channel can be archived and deleted."
+                f"{ticket_channel.topic}, this channel may have too many attachments! "
+                "Please let us know when your attachments have been saved so we can delete your channel."
             )
             return
         # successfuly archived the channel
