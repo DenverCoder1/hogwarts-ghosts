@@ -43,11 +43,18 @@ class CreateChannelButton(nextcord.ui.Button["CreateChannelView"]):
                 color=nextcord.Colour.red(),
             )
             return await interaction.send(embed=embed, ephemeral=True)
+        # calculate alphabetical position
+        position = max(
+            channel.position
+            for channel in category.text_channels
+            if channel.name < interaction.user.display_name.lower()
+        )
         # create the channel
         channel = await category.create_text_channel(
             f"{interaction.user.display_name}",
             reason=f"{interaction.user.display_name} requested a channel",
             topic=interaction.user.mention,
+            position=position,
         )
         # give the user manage messages permission on the channel
         await channel.set_permissions(
@@ -98,7 +105,8 @@ If you have a question, please ping your hosts!""",
             embed.timestamp = nextcord.utils.utcnow()
             await mod_log_channel.send(embed=embed)
         # sort the category
-        await discord_utils.sort_category(category)
+        if not discord_utils.category_is_sorted(category):
+            await discord_utils.sort_category(category)
 
 
 class CreateChannelView(nextcord.ui.View):

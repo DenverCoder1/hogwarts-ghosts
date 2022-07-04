@@ -335,3 +335,14 @@ async def sort_category(category: nextcord.CategoryChannel):
     channels = sorted(category.text_channels, key=lambda channel: channel.name)
     for i, channel in enumerate(channels):
         await channel.edit(position=start_position + i)
+
+
+def category_is_sorted(category: nextcord.CategoryChannel) -> bool:
+    """Checks if a category is sorted
+    Arguments:
+        - category (nextcord.CategoryChannel)
+    Returns:
+        - is_sorted (bool)
+    """
+    channel_names = [channel.name for channel in category.text_channels]
+    return sorted(channel_names) == channel_names
