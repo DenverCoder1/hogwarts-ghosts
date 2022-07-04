@@ -171,7 +171,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
             name=f"Sorting in progress",
             value=f"This may take a second or two.",
         )
-        await ctx.send(embed=embed)
+        response = await ctx.send(embed=embed)
 
         await discord_utils.sort_category(category)
 
@@ -180,7 +180,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
             name=f"{constants.SUCCESS}",
             value=f"Sorted category `{category.name}`",
         )
-        await ctx.send(embed=embed)
+        await response.edit(embed=embed)
 
 
 def setup(bot: commands.Bot):
