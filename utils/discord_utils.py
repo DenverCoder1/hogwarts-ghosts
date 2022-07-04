@@ -1,4 +1,3 @@
-import asyncio
 from typing import List, Tuple, Union
 
 import nextcord
@@ -340,8 +339,11 @@ async def sort_category(category: nextcord.CategoryChannel):
         if category_is_sorted(category):
             break
         if channel.position != start_position + i:
+            # move the channel to the correct position
             await channel.edit(position=start_position + i)
-            await asyncio.sleep(0.1)
+            # update the cache
+            channel.position = start_position + i
+            category.guild._channels[channel.id] = channel
 
 
 def category_is_sorted(category: nextcord.CategoryChannel) -> bool:
