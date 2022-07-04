@@ -143,11 +143,11 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
     @commands.has_permissions(manage_channels=True)
     async def sortcategory(self, ctx: commands.Context, category_name: str):
         logging_utils.log_command("sortcategory", ctx.guild, ctx.channel, ctx.author)
-        embed = discord_utils.create_embed()
 
         category = await discord_utils.find_category(ctx, category_name)
 
         if category is None:
+            embed = discord_utils.create_embed()
             embed.add_field(
                 name=f"{constants.FAILED}!",
                 value=f"Could not find category `{category_name}`",
@@ -156,7 +156,31 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
             await ctx.send(embed=embed)
             return
 
+        if discord_utils.category_is_sorted(category):
+            embed = discord_utils.create_embed()
+            embed.add_field(
+                name=f"{constants.SUCCESS}!",
+                value=f"Category `{category_name}` is already sorted",
+            )
+            # reply to user
+            await ctx.send(embed=embed)
+            return
+
+        embed = discord_utils.create_embed()
+        embed.add_field(
+            name=f"Sorting in progress",
+            value=f"This may take a second or two.",
+        )
+        await ctx.send(embed=embed)
+
         await discord_utils.sort_category(category)
+
+        embed = discord_utils.create_embed()
+        embed.add_field(
+            name=f"{constants.SUCCESS}",
+            value=f"Sorted category `{category.name}`",
+        )
+        await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot):
