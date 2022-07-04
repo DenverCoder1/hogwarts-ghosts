@@ -27,7 +27,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
             button_view = CreateChannelView(self.BUTTON_TEXT, self.EMBED_TITLE_SUFFIX)
             self._bot.add_view(button_view)
 
-    @commands.command()
+    @commands.command(name="ticketbtn", aliases=["ticketbutton", "ticket"])
     @commands.has_permissions(administrator=True)
     async def ticketbtn(self, ctx: commands.Context):
         """Creates a button for creating a confessional channel"""
@@ -56,7 +56,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         await ctx.send(embed=embed, view=button_view)
         await ctx.message.delete()
 
-    @commands.command()
+    @commands.command(name="close")
     @commands.has_permissions(administrator=True)
     async def close(self, ctx: commands.Context):
         """Archives and closes the channel that the user is currently in"""
@@ -138,6 +138,25 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         # delete the channel
         await asyncio.sleep(2)
         await ticket_channel.delete()
+
+    @commands.command(name="sortcategory", aliases=["sortcat"])
+    @commands.has_permissions(manage_channels=True)
+    async def sortcategory(self, ctx: commands.Context, category_name: str):
+        logging_utils.log_command("sortcategory", ctx.guild, ctx.channel, ctx.author)
+        embed = discord_utils.create_embed()
+
+        category = await discord_utils.find_category(ctx, category_name)
+
+        if category is None:
+            embed.add_field(
+                name=f"{constants.FAILED}!",
+                value=f"Could not find category `{category_name}`",
+            )
+            # reply to user
+            await ctx.send(embed=embed)
+            return
+
+        await discord_utils.sort_category(category)
 
 
 def setup(bot: commands.Bot):

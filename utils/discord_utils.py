@@ -324,3 +324,14 @@ def split_embed(embed: nextcord.Embed) -> List[nextcord.Embed]:
         else:
             embed_list[-1].add_field(name=field.name, value=field_description, inline=field.inline)
     return embed_list
+
+
+async def sort_category(category: nextcord.CategoryChannel):
+    """Sorts the channels in a category alphabetically
+    Arguments:
+        - category (nextcord.CategoryChannel)
+    """
+    start_position = category.text_channels[0].position
+    channels = sorted(category.text_channels, key=lambda channel: channel.name)
+    for i, channel in enumerate(channels):
+        await channel.edit(position=start_position + i)
