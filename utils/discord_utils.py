@@ -1,3 +1,4 @@
+import asyncio
 from typing import List, Tuple, Union
 
 import nextcord
@@ -331,10 +332,16 @@ async def sort_category(category: nextcord.CategoryChannel):
     Arguments:
         - category (nextcord.CategoryChannel)
     """
+    if len(category.text_channels) == 0:
+        return
     start_position = category.text_channels[0].position
     channels = sorted(category.text_channels, key=lambda channel: channel.name)
     for i, channel in enumerate(channels):
-        await channel.edit(position=start_position + i)
+        if category_is_sorted(category):
+            break
+        if channel.position != start_position + i:
+            await channel.edit(position=start_position + i)
+            await asyncio.sleep(0.1)
 
 
 def category_is_sorted(category: nextcord.CategoryChannel) -> bool:

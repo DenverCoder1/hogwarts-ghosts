@@ -169,11 +169,20 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         embed = discord_utils.create_embed()
         embed.add_field(
             name=f"Sorting in progress",
-            value=f"This may take a second or two.",
+            value=f"This may take a few seconds.",
         )
         response = await ctx.send(embed=embed)
 
         await discord_utils.sort_category(category)
+
+        if not discord_utils.category_is_sorted(category):
+            embed = discord_utils.create_embed()
+            embed.add_field(
+                name=f"{constants.FAILED}!",
+                value=f"Sorting of category `{category_name}` failed. Please try again.",
+            )
+            await response.edit(embed=embed)
+            return
 
         embed = discord_utils.create_embed()
         embed.add_field(
