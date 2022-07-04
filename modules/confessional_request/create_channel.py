@@ -3,6 +3,8 @@ from typing import Optional
 import nextcord
 from nextcord.ext import commands
 
+from utils import discord_utils
+
 
 class CreateChannelButton(nextcord.ui.Button["CreateChannelView"]):
     def __init__(self, label: str, title_suffix: str):
@@ -95,6 +97,8 @@ If you have a question, please ping your hosts!""",
             embed.set_footer(text=f"ID: {interaction.user.id}")
             embed.timestamp = nextcord.utils.utcnow()
             await mod_log_channel.send(embed=embed)
+        # sort the category
+        await discord_utils.sort_category(category)
 
 
 class CreateChannelView(nextcord.ui.View):

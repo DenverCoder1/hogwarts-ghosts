@@ -33,5 +33,3 @@ repos:
         name: Check YAML files for valid syntax.
       - id: debug-statements
         name: Check for debug statements.
-      - id: end-of-file-fixer
-        name: Check for only one newline character at EOL.
