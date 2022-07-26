@@ -1,7 +1,7 @@
 import asyncio
 import os
 import zipfile
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import nextcord
 from nextcord.ext import commands
@@ -129,7 +129,9 @@ class ArchiveCog(commands.Cog, name="Archive"):
 
     @command_predicates.is_verified()
     @commands.command(name="archivechannel", aliases=["archivechan"])
-    async def archivechannel(self, ctx, *args: Union[nextcord.TextChannel, str]):
+    async def archivechannel(
+        self, ctx: commands.Context[commands.Bot], *args: Union[nextcord.TextChannel, str]
+    ) -> Optional[nextcord.Message]:
         """Command to download channel's history
 
         Permission Category : Verified Roles only.
@@ -146,6 +148,9 @@ class ArchiveCog(commands.Cog, name="Archive"):
             return
         # If we don't have the lock, let the user know it may take a while.
         msg = None
+
+        # The final message sent to the channel will be returned
+        return_msg = None
 
         for channelname in args:
             if self.lock.locked():
@@ -169,8 +174,7 @@ class ArchiveCog(commands.Cog, name="Archive"):
                             value=f"Sorry, I cannot find a channel with name {channelname}. Try mentioning the channel (e.g. `#{channelname}`)",
                             inline=False,
                         )
-                        await ctx.send(embed=embed)
-                        return
+                        return await ctx.send(embed=embed)
                     if not channel.type.name == "text":
                         embed.add_field(
                             name="ERROR: Cannot archive non-text channels",
@@ -178,8 +182,7 @@ class ArchiveCog(commands.Cog, name="Archive"):
                             f"{channel} is a {channel.type} channel.",
                             inline=False,
                         )
-                        await ctx.send(embed=embed)
-                        return
+                        return ctx.send(embed=embed)
                 # If we've gotten to this point, we know we have a channel so we should probably let the user know.
                 start_embed = await self.get_start_embed(channel)
                 msg = await ctx.send(embed=start_embed)
@@ -199,8 +202,7 @@ class ArchiveCog(commands.Cog, name="Archive"):
                         f"to archive it",
                         inline=False,
                     )
-                    await ctx.send(embed=embed)
-                    return
+                    return await ctx.send(embed=embed)
                 file, embed = self.get_file_and_embed(
                     channel,
                     ctx.guild.filesize_limit,
@@ -212,7 +214,7 @@ class ArchiveCog(commands.Cog, name="Archive"):
                 # There has been an issue with AIO HTTP message sending fails, in which case discord.py crashes?
                 # So adding this try/catch for runtime to catch this. I don't think it's a deterministic error
                 try:
-                    await ctx.send(file=file, embed=embed)
+                    return_msg = await ctx.send(file=file, embed=embed)
                 except RuntimeError:
                     embed.add_field(
                         name="ERROR: Failed to send archive",
@@ -221,13 +223,14 @@ class ArchiveCog(commands.Cog, name="Archive"):
                         f"issue persists",
                         inline=False,
                     )
-                    await ctx.send(embed=embed)
+                    return_msg = await ctx.send(embed=embed)
 
                 if msg:
                     await msg.delete()
                     msg = None
             # Clean up the archive dir
             archive_utils.reset_archive_dir()
+        return return_msg
 
     @command_predicates.is_owner_or_admin()
     @commands.command(name="archivecategory", aliases=["archivecat"])

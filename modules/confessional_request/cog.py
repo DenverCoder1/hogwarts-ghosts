@@ -1,5 +1,6 @@
 import asyncio
 import copy
+from typing import Optional
 
 import nextcord
 from nextcord.ext import commands
@@ -91,15 +92,20 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         fake_ctx = copy.copy(ctx)
         fake_ctx.channel = archives_channel  # type: ignore
         # execute "~archivechannel #<ticket-channel>"
-        await archivechannel_cmd(fake_ctx, ticket_channel)
+        archive_message: Optional[nextcord.Message] = await archivechannel_cmd(
+            fake_ctx, ticket_channel
+        )
         # check that the new last message contains the attachment
-        last_message = None
-        if archives_channel.last_message is not None:
-            last_message = archives_channel.last_message
-        if last_message is None and archives_channel.last_message_id is not None:
-            last_message = await archives_channel.fetch_message(archives_channel.last_message_id)
+        if archive_message is None and archives_channel.last_message is not None:
+            archive_message = archives_channel.last_message
+        if archive_message is None and archives_channel.last_message_id is not None:
+            archive_message = await archives_channel.fetch_message(archives_channel.last_message_id)
         # failure to archive the channel
-        if not last_message or not last_message.attachments or last_message.embeds:
+        if not archive_message or not archive_message.attachments or archive_message.embeds:
+            print(
+                "The channel was not archived properly. "
+                f"{archive_message} {archive_message.attachments} {archive_message.embeds}"
+            )
             embed = discord_utils.create_embed()
             embed.add_field(
                 name=f"{constants.FAILED}",
