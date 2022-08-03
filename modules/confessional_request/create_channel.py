@@ -44,11 +44,12 @@ class CreateChannelButton(nextcord.ui.Button["CreateChannelView"]):
             )
             return await interaction.send(embed=embed, ephemeral=True)
         # calculate alphabetical position
-        position = max(
+        lower_channels = [
             channel.position
             for channel in category.text_channels
             if channel.name < interaction.user.display_name.lower()
-        )
+        ]
+        position = max(lower_channels) if lower_channels else 0
         # create the channel
         channel = await category.create_text_channel(
             f"{interaction.user.display_name}",
