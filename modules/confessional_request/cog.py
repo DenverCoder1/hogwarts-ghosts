@@ -217,8 +217,11 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         ),
         image: nextcord.Attachment = nextcord.SlashOption(),
     ):
-        """
-        Set the phase of the interaction.
+        """Send a phase image to all channels in a given category.
+
+        Arguments:
+            category_name: The name of the category to send the phase image to.
+            image: The image to send.
         """
         await interaction.response.defer()
 
