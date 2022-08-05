@@ -3,13 +3,24 @@ import copy
 from typing import Optional
 
 import nextcord
-from nextcord.ext import commands
+from nextcord.ext import application_checks, commands
 
 import constants
 from utils import discord_utils, logging_utils
 
 from .create_channel import CreateChannelView
 from .select_category import SelectCategoryView
+
+
+async def _autocomplete_categories(_, interaction: nextcord.Interaction, input: str):
+    """
+    Autocomplete categories for the interaction.
+    """
+    categories = interaction.guild.categories if interaction.guild else []
+    category_names = [c.name for c in categories]
+    if input:
+        category_names = [c for c in category_names if c.lower().startswith(input.lower())]
+    await interaction.response.send_autocomplete(category_names)
 
 
 class ConfessionalRequest(commands.Cog, name="Confessional Request"):
@@ -196,6 +207,88 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
             value=f"Sorted category `{category.name}`",
         )
         await response.edit(embed=embed)
+
+    @nextcord.slash_command()
+    async def phase(
+        self,
+        interaction: nextcord.Interaction,
+        category_name: str = nextcord.SlashOption(
+            name="category", autocomplete_callback=_autocomplete_categories
+        ),
+        image: nextcord.Attachment = nextcord.SlashOption(),
+    ):
+        """
+        Set the phase of the interaction.
+        """
+        await interaction.response.defer()
+
+        ctx: commands.Context = discord_utils.interaction_to_fake_ctx(interaction)  # type: ignore
+
+        logging_utils.log_command("/phase", ctx.guild, ctx.channel, ctx.author)  # type: ignore
+
+        category = await discord_utils.find_category(ctx, category_name)  # type: ignore
+
+        if category is None:
+            embed = discord_utils.create_embed()
+            embed.add_field(
+                name=f"{constants.FAILED}!",
+                value=f"Could not find category `{category_name}`",
+            )
+            # reply to user
+            await interaction.send(embed=embed)
+            return
+
+        if not category.text_channels:
+            embed = discord_utils.create_embed()
+            embed.add_field(
+                name=f"{constants.SUCCESS}!",
+                value=f"Category `{category_name}` has no channels to send to",
+            )
+            # reply to user
+            await interaction.send(embed=embed)
+            return
+
+        if not isinstance(interaction.channel, nextcord.TextChannel) or not isinstance(
+            interaction.user, nextcord.Member
+        ):
+            embed = discord_utils.create_embed()
+            embed.add_field(
+                name=f"{constants.FAILED}!",
+                value=f"An error occurred with the channel or user",
+            )
+            # reply to user
+            await interaction.send(embed=embed)
+            return
+
+        for channel in category.text_channels:
+            if not channel.permissions_for(interaction.user).send_messages:
+                embed = discord_utils.create_embed()
+                embed.add_field(
+                    name=f"{constants.FAILED}!",
+                    value=f"You do not have permission to send messages in {channel.mention}",
+                )
+                # reply to user
+                await interaction.send(embed=embed)
+
+            try:
+                await channel.send(file=await image.to_file())
+            except nextcord.HTTPException:
+                embed = discord_utils.create_embed()
+                embed.add_field(
+                    name=f"{constants.FAILED}!",
+                    value=f"The bot could not send the image to {channel.mention}",
+                )
+                # reply to user
+                await interaction.send(embed=embed)
+                return
+
+        embed = discord_utils.create_embed()
+        embed.add_field(
+            name=f"{constants.SUCCESS}!",
+            value=f"Sent the image to all channels in {category_name}",
+        )
+        # reply to user
+        await interaction.send(embed=embed)
 
 
 def setup(bot: commands.Bot):
