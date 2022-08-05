@@ -355,3 +355,20 @@ def category_is_sorted(category: nextcord.CategoryChannel) -> bool:
     """
     channel_names = [channel.name for channel in category.text_channels]
     return sorted(channel_names) == channel_names
+
+
+def interaction_to_fake_ctx(interaction: nextcord.Interaction) -> nextcord.Object:
+    """Converts an interaction to a fake context
+    Arguments:
+        - interaction (nextcord.Interaction)
+    Returns:
+        - ctx (nextcord.Object)
+    """
+    ctx = nextcord.Object(id=interaction.id)
+    ctx.guild = interaction.guild  # type: ignore
+    ctx.channel = interaction.channel  # type: ignore
+    ctx.author = interaction.user  # type: ignore
+    ctx.bot = interaction.client  # type: ignore
+    ctx.send = interaction.send  # type: ignore
+    ctx.reply = interaction.send  # type: ignore
+    return ctx
