@@ -70,7 +70,7 @@ async def on_error(event, *args, **kwargs):
         if user_error:
             embed = discord_utils.create_embed()
             embed.add_field(name="Error!", value=user_error, inline=False)
-    await args.channel.send(embed=embed)
+    await arg.channel.send(embed=embed)
 
 
 async def on_command_error(ctx, error):
