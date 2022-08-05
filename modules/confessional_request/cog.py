@@ -274,7 +274,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
                 await interaction.send(embed=embed)
 
             try:
-                await channel.send(file=await image.to_file())
+                await channel.send(content=image.url)
             except nextcord.HTTPException:
                 embed = discord_utils.create_embed()
                 embed.add_field(
