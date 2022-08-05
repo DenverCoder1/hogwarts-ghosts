@@ -39,6 +39,24 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
             button_view = CreateChannelView(self.BUTTON_TEXT, self.EMBED_TITLE_SUFFIX)
             self._bot.add_view(button_view)
 
+    async def send_confessional_button(
+        self, ctx: commands.Context, category: nextcord.CategoryChannel
+    ):
+        """
+        Send the confessional ticket button to the user.
+        """
+        button_view = CreateChannelView(
+            label=self.BUTTON_TEXT,
+            title_suffix=self.EMBED_TITLE_SUFFIX,
+            ctx=ctx,
+        )
+        embed = nextcord.Embed(
+            title=f"{category.name}{self.EMBED_TITLE_SUFFIX}",
+            description=f'If you want to write confessionals in {category.name}, click "{self.BUTTON_TEXT}" below. This will make a private confessional channel for you where spectators and dead players can read your thoughts!',
+            color=0x009999,
+        )
+        await ctx.send(embed=embed, view=button_view)
+
     @commands.command(name="ticketbtn", aliases=["ticketbutton", "ticket"])
     @commands.has_permissions(administrator=True)
     async def ticketbtn(self, ctx: commands.Context):
@@ -55,18 +73,43 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         if category is None:
             return await ctx.send("No category selected", delete_after=3)
         # create the button view
-        button_view = CreateChannelView(
-            label=self.BUTTON_TEXT,
-            title_suffix=self.EMBED_TITLE_SUFFIX,
-            ctx=ctx,
-        )
-        embed = nextcord.Embed(
-            title=f"{category.name}{self.EMBED_TITLE_SUFFIX}",
-            description=f'If you want to write confessionals in {category.name}, click "{self.BUTTON_TEXT}" below. This will make a private confessional channel for you where spectators and dead players can read your thoughts!',
-            color=0x009999,
-        )
-        await ctx.send(embed=embed, view=button_view)
+        await self.send_confessional_button(ctx, category)
         await ctx.message.delete()
+
+    @nextcord.slash_command(name="ticketbutton")
+    @application_checks.has_permissions(administrator=True)
+    async def ticketbtn_slash(
+        self,
+        interaction: nextcord.Interaction,
+        category_name: str = nextcord.SlashOption(
+            name="category", autocomplete_callback=_autocomplete_categories
+        ),
+    ):
+        """
+        Creates a button for creating confessional channels.
+
+        Arguments:
+            category_name: The name of the category to create channels in.
+        """
+        await interaction.response.defer()
+
+        ctx = discord_utils.FakeContext.from_interaction(interaction)
+
+        logging_utils.log_command("/phase", ctx.guild, ctx.channel, ctx.author)
+
+        category = await discord_utils.find_category(ctx, category_name)
+
+        if category is None:
+            embed = discord_utils.create_embed()
+            embed.add_field(
+                name=f"{constants.FAILED}!",
+                value=f"Could not find category `{category_name}`",
+            )
+            # reply to user
+            await interaction.send(embed=embed)
+            return
+
+        await self.send_confessional_button(ctx, category)
 
     @commands.command(name="close")
     @commands.has_permissions(administrator=True)
@@ -75,15 +118,15 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         # check that the topic is a user mention
         logging_utils.log_command("close", ctx.guild, ctx.channel, ctx.author)
         ticket_channel = ctx.channel
-        if not getattr(ticket_channel, "topic", "").startswith("<@"):
+        assert ctx.guild is not None
+        assert isinstance(ticket_channel, nextcord.TextChannel)
+        if not str(ticket_channel.topic).startswith("<@"):
             embed = discord_utils.create_embed()
             embed.add_field(
                 name=f"{constants.FAILED}",
                 value="You are not in a confessional channel",
             )
             return await ctx.send(embed=embed)
-        assert ctx.guild is not None
-        assert isinstance(ticket_channel, nextcord.TextChannel)
         archivechannel_cmd = self._bot.get_command("archivechannel")
         assert isinstance(archivechannel_cmd, commands.Command)
         archives_channel = nextcord.utils.find(
@@ -102,6 +145,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         # create a context where the message is the last message in the archive channel
         fake_ctx = copy.copy(ctx)
         fake_ctx.channel = archives_channel  # type: ignore
+        fake_ctx.send = archives_channel.send  # type: ignore
         # execute "~archivechannel #<ticket-channel>"
         archive_message: Optional[nextcord.Message] = await archivechannel_cmd(
             fake_ctx, ticket_channel
@@ -155,6 +199,14 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         # delete the channel
         await asyncio.sleep(2)
         await ticket_channel.delete()
+
+    @nextcord.slash_command(name="close")
+    @application_checks.has_permissions(administrator=True)
+    async def close_slash(self, interaction: nextcord.Interaction):
+        """Closes the channel that the user is currently in."""
+        await interaction.response.defer()
+        ctx = discord_utils.FakeContext.from_interaction(interaction)
+        await self.close(ctx)
 
     @commands.command(name="sortcategory", aliases=["sortcat"])
     @commands.has_permissions(manage_channels=True)
@@ -225,11 +277,11 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         """
         await interaction.response.defer()
 
-        ctx: commands.Context = discord_utils.interaction_to_fake_ctx(interaction)  # type: ignore
+        ctx: commands.Context = discord_utils.FakeContext.from_interaction(interaction)
 
-        logging_utils.log_command("/phase", ctx.guild, ctx.channel, ctx.author)  # type: ignore
+        logging_utils.log_command("/phase", ctx.guild, ctx.channel, ctx.author)
 
-        category = await discord_utils.find_category(ctx, category_name)  # type: ignore
+        category = await discord_utils.find_category(ctx, category_name)
 
         if category is None:
             embed = discord_utils.create_embed()

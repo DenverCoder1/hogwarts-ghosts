@@ -1,11 +1,10 @@
-from typing import List, Tuple, Union
+from typing import List, Optional, Union
 
 import nextcord
 from nextcord.ext import commands
 from nextcord.ext.commands.errors import ChannelNotFound
 
 import constants
-from modules.solved import solved_constants
 
 
 def category_is_full(category: nextcord.CategoryChannel) -> bool:
@@ -357,18 +356,42 @@ def category_is_sorted(category: nextcord.CategoryChannel) -> bool:
     return sorted(channel_names) == channel_names
 
 
-def interaction_to_fake_ctx(interaction: nextcord.Interaction) -> nextcord.Object:
-    """Converts an interaction to a fake context
-    Arguments:
-        - interaction (nextcord.Interaction)
-    Returns:
-        - ctx (nextcord.Object)
-    """
-    ctx = nextcord.Object(id=interaction.id)
-    ctx.guild = interaction.guild  # type: ignore
-    ctx.channel = interaction.channel  # type: ignore
-    ctx.author = interaction.user  # type: ignore
-    ctx.bot = interaction.client  # type: ignore
-    ctx.send = interaction.send  # type: ignore
-    ctx.reply = interaction.send  # type: ignore
-    return ctx
+class FakeContext(commands.Context):
+    def __init__(self, **kwargs):
+        self.message: nextcord.Message = kwargs.get("message", nextcord.utils.MISSING)
+        self.bot = kwargs.get("bot", nextcord.utils.MISSING)
+        self.args = kwargs.get("args", [])
+        self.kwargs = kwargs.get("kwargs", {})
+        self.prefix = kwargs.get("prefix", None)
+        self.command = kwargs.get("command", None)
+        self.view = kwargs.get("view", nextcord.utils.MISSING)
+        self.invoked_with = kwargs.get("invoked_with", None)
+        self.invoked_parents = kwargs.get("invoked_parents", [])
+        self.invoked_subcommand = kwargs.get("invoked_subcommand", None)
+        self.subcommand_passed = kwargs.get("subcommand_passed", False)
+        self.command_failed = kwargs.get("command_failed", False)
+        self.current_parameter = kwargs.get("current_parameter", None)
+        self._state = kwargs.get("_state", nextcord.utils.MISSING)
+        if "send" in kwargs:
+            self.send = kwargs["send"]
+        if "reply" in kwargs:
+            self.reply = kwargs["reply"]
+        if "guild" in kwargs:
+            self.guild: nextcord.Guild = kwargs["guild"]
+        if "author" in kwargs:
+            self.author: Union[nextcord.User, nextcord.Member] = kwargs["author"]
+        if "channel" in kwargs:
+            self.channel: nextcord.abc.GuildChannel = kwargs["channel"]
+        self.interaction: Optional[nextcord.Interaction] = None
+
+    @classmethod
+    def from_interaction(cls, interaction: nextcord.Interaction):
+        return cls(
+            bot=interaction.client,
+            prefix="/",
+            send=interaction.send,
+            reply=interaction.send,
+            guild=interaction.guild,
+            author=interaction.user,
+            channel=interaction.channel,
+        )
