@@ -12,17 +12,6 @@ from .create_channel import CreateChannelView
 from .select_category import SelectCategoryView
 
 
-async def _autocomplete_categories(_, interaction: nextcord.Interaction, input: str):
-    """
-    Autocomplete categories for the interaction.
-    """
-    categories = interaction.guild.categories if interaction.guild else []
-    category_names = [c.name for c in categories]
-    if input:
-        category_names = [c for c in category_names if c.lower().startswith(input.lower())]
-    await interaction.response.send_autocomplete(category_names)
-
-
 class ConfessionalRequest(commands.Cog, name="Confessional Request"):
     """Channel request button system"""
 
@@ -81,15 +70,15 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
     async def ticketbtn_slash(
         self,
         interaction: nextcord.Interaction,
-        category_name: str = nextcord.SlashOption(
-            name="category", autocomplete_callback=_autocomplete_categories
+        category: nextcord.abc.GuildChannel = nextcord.SlashOption(
+            channel_types=[nextcord.ChannelType.category]
         ),
     ):
         """
         Creates a button for creating confessional channels.
 
         Arguments:
-            category_name: The name of the category to create channels in.
+            category: The category to create channels in.
         """
         await interaction.response.defer()
 
@@ -97,17 +86,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
 
         logging_utils.log_command("/phase", ctx.guild, ctx.channel, ctx.author)
 
-        category = await discord_utils.find_category(ctx, category_name)
-
-        if category is None:
-            embed = discord_utils.create_embed()
-            embed.add_field(
-                name=f"{constants.FAILED}!",
-                value=f"Could not find category `{category_name}`",
-            )
-            # reply to user
-            await interaction.send(embed=embed)
-            return
+        assert isinstance(category, nextcord.CategoryChannel)
 
         await self.send_confessional_button(ctx, category)
 
@@ -264,15 +243,15 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
     async def phase(
         self,
         interaction: nextcord.Interaction,
-        category_name: str = nextcord.SlashOption(
-            name="category", autocomplete_callback=_autocomplete_categories
+        category: nextcord.abc.GuildChannel = nextcord.SlashOption(
+            channel_types=[nextcord.ChannelType.category]
         ),
         image: nextcord.Attachment = nextcord.SlashOption(),
     ):
         """Send a phase image to all channels in a given category.
 
         Arguments:
-            category_name: The name of the category to send the phase image to.
+            category: The category to send the phase image to.
             image: The image to send.
         """
         await interaction.response.defer()
@@ -281,23 +260,13 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
 
         logging_utils.log_command("/phase", ctx.guild, ctx.channel, ctx.author)
 
-        category = await discord_utils.find_category(ctx, category_name)
-
-        if category is None:
-            embed = discord_utils.create_embed()
-            embed.add_field(
-                name=f"{constants.FAILED}!",
-                value=f"Could not find category `{category_name}`",
-            )
-            # reply to user
-            await interaction.send(embed=embed)
-            return
+        assert isinstance(category, nextcord.CategoryChannel)
 
         if not category.text_channels:
             embed = discord_utils.create_embed()
             embed.add_field(
                 name=f"{constants.SUCCESS}!",
-                value=f"Category `{category_name}` has no channels to send to",
+                value=f"Category `{category.name}` has no channels to send to",
             )
             # reply to user
             await interaction.send(embed=embed)
@@ -340,7 +309,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         embed = discord_utils.create_embed()
         embed.add_field(
             name=f"{constants.SUCCESS}!",
-            value=f"Sent the image to all channels in {category_name}",
+            value=f"Sent the image to all channels in {category.name}",
         )
         # reply to user
         await interaction.send(embed=embed)
