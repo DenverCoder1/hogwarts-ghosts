@@ -1,6 +1,7 @@
 import os
 import sys
 
+import nextcord
 from nextcord.ext import commands
 
 from modules.error_logging import error_constants
@@ -70,7 +71,11 @@ async def on_error(event, *args, **kwargs):
         if user_error:
             embed = discord_utils.create_embed()
             embed.add_field(name="Error!", value=user_error, inline=False)
-    await arg.channel.send(embed=embed)
+    channel = arg.channel if hasattr(arg, "channel") else None
+    if channel:
+        await channel.send(embed=embed)
+    else:
+        print(user_error)
 
 
 async def on_command_error(ctx, error):
