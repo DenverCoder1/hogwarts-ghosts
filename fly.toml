@@ -1,0 +1,8 @@
+# fly.toml file generated for hogwarts-ghosts on 2022-10-14T14:46:29-06:00
+
+app = "hogwarts-ghosts"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[env]
