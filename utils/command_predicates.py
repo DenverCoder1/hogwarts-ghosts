@@ -79,7 +79,6 @@ def is_verified():
 def is_trusted():
     async def predicate(ctx):
         if ctx.message.author.guild_permissions.administrator:
-
             return True
         if ctx.message.guild is None:
             return False
