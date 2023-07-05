@@ -20,13 +20,6 @@ BYTES_TO_MEGABYTES = 1_048_576  # 1024 squared
 ###########
 MODULES_DIR = "modules"
 
-
-############
-# DATABASE #
-############
-
-DB_GLOBAL = "global"
-
 ############
 # REMINDER #
 ############

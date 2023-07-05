@@ -2,3 +2,5 @@ pre-commit==2.18.1
 taskipy==1.10.1
 slotscheck==0.14.0
 pyright==1.1.244
+pytest==6.2.2
+pytest-mock==3.5.1

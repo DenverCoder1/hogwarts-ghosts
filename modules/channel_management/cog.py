@@ -21,7 +21,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
     # CHANNEL COMMANDS #
     ####################
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="movechannel", aliases=["movechan"])
     async def movechannel(self, ctx, category_name: str, *args: Union[nextcord.TextChannel, str]):
         """Command to move channels to category with given name
@@ -121,7 +121,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
 
         await ctx.send(embed=embed)
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="renamechannel", aliases=["renamechan"])
     async def renamechannel(
         self,
@@ -187,7 +187,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
         )
         await ctx.send(embed=embed)
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="createchannel", aliases=["makechannel", "makechan", "createchan"])
     async def createchannel(self, ctx, name: str):
         """Command to create channel in same category with given name
@@ -222,7 +222,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
             )
         await ctx.send(embed=embed)
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="clonechannel", aliases=["clonechan", "chanclone"])
     async def clonechannel(
         self,
@@ -381,7 +381,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
         # reply to user
         await ctx.send(embed=embed)
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="shiftchannel", aliases=["shiftchan"])
     async def shiftchannel(
         self,
@@ -481,7 +481,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
     # VOICE CHANNEL COMMANDS #
     ##########################
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="renamevoicechan", aliases=["renamevc", "renamevoice"])
     async def renamevoicechan(self, ctx, new_name: str):
         """Command to rename the Voice Channel in which the user currently is
@@ -535,7 +535,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
     # CATEGORY COMMANDS #
     #####################
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="renamecategory", aliases=["renamecat"])
     async def renamecategory(self, ctx, cat_a_name: str, cat_b_name: str = ""):
         """Renames the given category to whatever is asked
@@ -589,7 +589,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
         )
         await ctx.send(embed=embed)
 
-    @command_predicates.is_trusted()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="synccategory", aliases=["synccat", "catsync"])
     async def synccategory(self, ctx, cat_name: str = ""):
         """Changes permissions of all channels in Current Category to be synced to Cat-permissions.
@@ -653,7 +653,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
         )
         await ctx.send(embed=embed)
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="shiftcategory", aliases=["shiftcat", "movecategory", "movecat"])
     async def shiftcategory(self, ctx, cat_a_name: str, cat_b_name: str = ""):
         """Shifts a category to below another category.
@@ -747,7 +747,7 @@ class ChannelManagementCog(commands.Cog, name="Channel Management"):
             )
         await ctx.send(embed=embed)
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(
         name="clonecategory",
         aliases=["copycategory", "clonecat", "copycat", "catclone"],

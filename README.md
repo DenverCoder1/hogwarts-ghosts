@@ -12,16 +12,14 @@ This bot is a fork of [bot-be-named](https://github.com/kevslinger/bot-be-named)
 ### Prerequisites
 
 - [python3.8 or newer](https://realpython.com/installing-python/)
-
 - [Git](https://github.com/git-guides/install-git)
-
-- [Postgresql for storing data](https://www.postgresql.org/download/)
-
-- [Heroku CLI client for hosting](https://medium.com/analytics-vidhya/how-to-install-heroku-cli-in-windows-pc-e3cf9750b4ae)
-
 - [Pip package installer for Python](https://phoenixnap.com/kb/install-pip-windows)
 
-Note that you may use another Python installer (instead of Pip), Host (instead of Heroku) or Database (instead of Postgresql) but that will require you figuring out the required setup and configuation changes yourself.
+One of:
+- [Heroku CLI client for hosting](https://medium.com/analytics-vidhya/how-to-install-heroku-cli-in-windows-pc-e3cf9750b4ae)
+- [Flyctl for hosting](https://jonahlawrence.hashnode.dev/hosting-a-python-discord-bot-for-free-with-flyio)
+
+Note that you may use another Python installer (instead of Pip), Host (instead of Heroku/Fly.io) but that will require you figuring out the required setup and configuration changes yourself.
 
 ### Installation
 
@@ -39,15 +37,13 @@ source .venv\Scripts\activate # Windows
 pip install -r requirements.txt && pre-commit install
 ```
 
-The bot uses [Heroku Postgres](https://www.heroku.com/postgres) for storing data.
-
 To run the bot locally, you will need a `.env` file which is used by [python-dotenv](https://github.com/theskumar/python-dotenv) to load `ENV` variables. Copy `.env.template` into `.env` with  
 
 ```bash
 cp .env.template .env
 ```
 
-and fill in the blanks in order to get the bot running. You also need to set up the Postgresql database for the bot using Heroku's PostgresSQL add-on (To be finished). First [install the add-on](https://elements.heroku.com/addons/heroku-postgresql) then [set it up](https://devcenter.heroku.com/articles/heroku-postgresql) to attach your app to the Postgres. Now you can look at `Heroku - Dashboard - Resources - Add Ons` to look at the app on Heroku, and copy the URI given from Postgres add-on to the respective line in the `.env file`
+and fill in the blanks in order to get the bot running.
 
 Once you do all that, run
 
@@ -72,7 +68,6 @@ When deploying on heroku, any variables stored in .env locally cannot be pushed 
 
 ## Current Modules
 
-- [Admin](./modules/admin) for administrator commands
 - [Archive](./modules/archive) for downloading channel/category/server contents into a Zip file
 - [Channel Management](./modules/channel_management) for cloning, creating, and moving channels - [Cipher Race](modules/cipher_race) Race against the clock decoding ciphers!
 - [Confessional Request](./modules/confessional_request) for allowing users to create temporary channels in a category
@@ -85,7 +80,6 @@ When deploying on heroku, any variables stored in .env locally cannot be pushed 
 - [Music Race](./modules/music_race/) Help! Our tunes have been sawed apart and put back incorrectly!
 - [Perfect Pitch](./modules/perfect_pitch) Become a composer and write tunes in mp4
 - [Role Management](./modules/role_management) for managing roles and similar
-- [Solved](./modules/solved) for marking Discord Channels as solved, backsolved, solvedish etc.
 
 Note: the main purpose of this bot is for Confessional Requests and Archiving.
 

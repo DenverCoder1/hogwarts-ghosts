@@ -169,7 +169,7 @@ class MiscCog(commands.Cog, name="Misc"):
     # BOTSAY COMMANDS #
     ###################
 
-    @command_predicates.is_trusted()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="botsay")
     async def botsay(self, ctx, channel_id_or_name: str, *args):
         """Say something in another channel
@@ -217,7 +217,7 @@ class MiscCog(commands.Cog, name="Misc"):
         # reply to user
         await ctx.send(embed=embed)
 
-    @command_predicates.is_trusted()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="botsayembed")
     async def botsayembed(self, ctx, channel_id_or_name: str, *args):
         """Say something in another channel, but as an embed

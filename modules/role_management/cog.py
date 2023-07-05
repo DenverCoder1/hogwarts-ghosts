@@ -18,7 +18,7 @@ class RoleManagementCog(commands.Cog, name="Role Management"):
     # ROLE COMMANDS #
     #################
 
-    @command_predicates.is_trusted()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="assignrole", aliases=["makerole", "createrole", "addrole"])
     async def assignrole(
         self,
@@ -128,7 +128,7 @@ class RoleManagementCog(commands.Cog, name="Role Management"):
             )
         await ctx.send(embed=embed)
 
-    @command_predicates.is_trusted()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="unassignrole", aliases=["removerole"])
     async def unassignrole(
         self,
@@ -220,7 +220,7 @@ class RoleManagementCog(commands.Cog, name="Role Management"):
             )
         await ctx.send(embed=embed)
 
-    @command_predicates.is_trusted()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="clonerole", aliases=["syncrole"])
     async def clonerole(
         self,

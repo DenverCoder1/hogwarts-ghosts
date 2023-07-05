@@ -172,7 +172,7 @@ class DiscordCog(commands.Cog, name="Discord"):
     # STATISTICS COMMANDS #
     #######################
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="stats")
     async def stats(self, ctx):
         """Get server stats
@@ -197,7 +197,7 @@ class DiscordCog(commands.Cog, name="Discord"):
 
         await ctx.send(embed=embed)
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="catstats")
     async def catstats(self, ctx, cat_name: str = ""):
         """Get category stats
@@ -231,7 +231,7 @@ class DiscordCog(commands.Cog, name="Discord"):
     # EMOJI COMMANDS #
     ##################
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="listemoji", aliases=["lsemoji", "listemojis", "lsemojis"])
     async def listemoji(self, ctx):
         """List all emojis in a server
@@ -247,7 +247,7 @@ class DiscordCog(commands.Cog, name="Discord"):
         )
         await ctx.send(embed=embed)
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="steal")
     async def steal(self, ctx, *emojis: typing.Union[nextcord.Emoji, nextcord.PartialEmoji]):
         """Steals an emote from another server and uploads it to this server with the same name.

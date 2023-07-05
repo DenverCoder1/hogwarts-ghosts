@@ -127,7 +127,7 @@ class ArchiveCog(commands.Cog, name="Archive"):
             embed = None
         return file, embed
 
-    @command_predicates.is_verified()
+    @commands.has_permissions(administrator=True)
     @commands.command(name="archivechannel", aliases=["archivechan"])
     async def archivechannel(
         self, ctx: commands.Context[commands.Bot], *args: Union[nextcord.TextChannel, str]
