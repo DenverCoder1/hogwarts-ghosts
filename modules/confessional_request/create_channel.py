@@ -63,6 +63,8 @@ class CreateChannelButton(nextcord.ui.Button["CreateChannelView"]):
             manage_messages=True,
             view_channel=True,
             send_messages=True,
+            read_messages=True,
+            read_message_history=True,
         )
         # send a message to the channel
         embed = nextcord.Embed(

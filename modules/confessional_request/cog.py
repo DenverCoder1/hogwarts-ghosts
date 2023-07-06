@@ -314,6 +314,46 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         # reply to user
         await interaction.send(embed=embed)
 
+    @nextcord.slash_command()
+    @application_checks.has_permissions(administrator=True)
+    async def add_permissions(
+        self,
+        interaction: nextcord.Interaction,
+        user: nextcord.Member,
+        channel: nextcord.TextChannel,
+    ):
+        """Add permissions for a user to a channel.
+
+        Arguments:
+            user: The user to add permissions for.
+            channel: The channel to add permissions for.
+        """
+        await interaction.response.defer()
+
+        ctx: commands.Context = discord_utils.FakeContext.from_interaction(interaction)
+
+        logging_utils.log_command("/add_permissions", ctx.guild, ctx.channel, ctx.author)
+
+        assert isinstance(user, nextcord.Member)
+        assert isinstance(channel, nextcord.TextChannel)
+
+        await channel.set_permissions(
+            user,
+            manage_messages=True,
+            view_channel=True,
+            send_messages=True,
+            read_messages=True,
+            read_message_history=True,
+        )
+
+        embed = discord_utils.create_embed()
+        embed.add_field(
+            name=f"{constants.SUCCESS}!",
+            value=f"Added permissions for {user.mention} to {channel.mention}",
+        )
+        # reply to user
+        await interaction.send(embed=embed)
+
 
 def setup(bot: commands.Bot):
     bot.add_cog(ConfessionalRequest(bot))
