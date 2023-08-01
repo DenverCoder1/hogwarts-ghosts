@@ -1,7 +1,7 @@
 import asyncio
 import os
 import zipfile
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import nextcord
 from nextcord.ext import commands
@@ -127,8 +127,8 @@ class ArchiveCog(commands.Cog, name="Archive"):
             embed = None
         return file, embed
 
-    @commands.has_permissions(administrator=True)
     @commands.command(name="archivechannel", aliases=["archivechan"])
+    @commands.has_any_role(*constants.HOST_ROLES)
     async def archivechannel(
         self, ctx: commands.Context[commands.Bot], *args: Union[nextcord.TextChannel, str]
     ) -> Optional[nextcord.Message]:

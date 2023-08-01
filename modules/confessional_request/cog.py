@@ -47,7 +47,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         await ctx.send(embed=embed, view=button_view)
 
     @commands.command(name="ticketbtn", aliases=["ticketbutton", "ticket"])
-    @commands.has_permissions(administrator=True)
+    @commands.has_any_role(*constants.HOST_ROLES)
     async def ticketbtn(self, ctx: commands.Context):
         """Creates a button for creating a confessional channel"""
         if ctx.guild is None:
@@ -66,7 +66,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         await ctx.message.delete()
 
     @nextcord.slash_command(name="ticketbutton")
-    @application_checks.has_permissions(administrator=True)
+    @application_checks.has_any_role(*constants.HOST_ROLES)
     async def ticketbtn_slash(
         self,
         interaction: nextcord.Interaction,
@@ -91,7 +91,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         await self.send_confessional_button(ctx, category)
 
     @commands.command(name="close")
-    @commands.has_permissions(administrator=True)
+    @commands.has_any_role(*constants.HOST_ROLES)
     async def close(self, ctx: commands.Context):
         """Archives and closes the channel that the user is currently in"""
         # check that the topic is a user mention
@@ -180,7 +180,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         await ticket_channel.delete()
 
     @nextcord.slash_command(name="close")
-    @application_checks.has_permissions(administrator=True)
+    @application_checks.has_any_role(*constants.HOST_ROLES)
     async def close_slash(self, interaction: nextcord.Interaction):
         """Closes the channel that the user is currently in."""
         await interaction.response.defer()
@@ -188,7 +188,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         await self.close(ctx)
 
     @commands.command(name="sortcategory", aliases=["sortcat"])
-    @commands.has_permissions(manage_channels=True)
+    @commands.has_any_role(*constants.HOST_ROLES)
     async def sortcategory(self, ctx: commands.Context, category_name: str):
         logging_utils.log_command("sortcategory", ctx.guild, ctx.channel, ctx.author)
 
@@ -315,7 +315,7 @@ class ConfessionalRequest(commands.Cog, name="Confessional Request"):
         await interaction.send(embed=embed)
 
     @nextcord.slash_command()
-    @application_checks.has_permissions(administrator=True)
+    @application_checks.has_any_role(*constants.HOST_ROLES)
     async def add_permissions(
         self,
         interaction: nextcord.Interaction,
